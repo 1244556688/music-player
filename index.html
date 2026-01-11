@@ -346,7 +346,7 @@ function formatTime(s){ if(!isFinite(s)) return '00:00'; const m=Math.floor(s/60
 function showIntroThenTest(){
   // overlay-like status message in center
   const prevTitle = titleEl.textContent;
-  titleEl.textContent = '🎤 你絕對猜不到這首歌是什麼...';
+  titleEl.textContent = '';
   // show your custom funny text if set
   if(funnyText && funnyText.trim().length) titleEl.textContent += ' ' + funnyText;
   // wait then try to play test file
