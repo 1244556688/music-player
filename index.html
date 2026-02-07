@@ -33,12 +33,13 @@
         align-items: center;
     }
 
-    /* === 排版佈局 === */
+    /* === 排版佈局 (已調整高度) === */
     .wrap {
         display: flex;
         width: 95%;
         max-width: 1100px;
-        height: 85vh;
+        /* 從 85vh 改為 75vh，讓底部抬高 */
+        height: 75vh; 
         gap: 20px;
         position: relative;
         z-index: 10;
@@ -72,9 +73,10 @@
         flex: 1;
         overflow-y: auto;
         padding-right: 4px;
+        /* 增加底部內距，避免清單最後一項被按鈕遮擋太近 */
+        padding-bottom: 10px;
     }
     
-    /* 自訂捲軸 */
     .playlist-scroll::-webkit-scrollbar { width: 4px; }
     .playlist-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
 
@@ -99,9 +101,15 @@
 
     .track-info { display: flex; flex-direction: column; overflow: hidden; }
     .track-name { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-    .track-dur { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
     
-    .btn-group { margin-top: 16px; display: flex; gap: 10px; }
+    /* === 按鈕組 (已調整位置) === */
+    .btn-group { 
+        margin-top: 16px; 
+        display: flex; 
+        gap: 10px;
+        /* 這裡增加了 margin-bottom，讓按鈕往上抬 */
+        margin-bottom: 12px;
+    }
     
     .btn-file {
         flex: 1;
@@ -118,6 +126,7 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
+        box-shadow: 0 4px 15px rgba(0, 229, 168, 0.2);
     }
     .btn-file:active { transform: scale(0.98); }
     .btn-ghost {
@@ -145,7 +154,6 @@
         position: relative;
     }
     
-    /* 玻璃球反光效果 */
     #musicBall::after {
         content: '';
         position: absolute;
@@ -403,12 +411,11 @@
         
         renderPlaylist();
         
-        // 如果是第一批加入的歌，自動載入第一首
         if(currentIdx === -1 && tracks.length > 0) {
-            loadTrack(0, false); // 不自動播，等待用戶點擊
+            loadTrack(0, false);
         }
         
-        this.value = ''; // 重置 input 以便重複選取
+        this.value = '';
     });
 
     function renderPlaylist() {
@@ -441,7 +448,6 @@
         audio.src = tracks[index].url;
         titleEl.textContent = tracks[index].name;
         
-        // 更新 UI 狀態
         renderPlaylist();
         
         if(autoPlay) {
@@ -452,7 +458,6 @@
     }
 
     function playAudio() {
-        // 瀏覽器政策：必須有互動才能啟動 AudioContext
         initAudioContext();
         if(audioCtx && audioCtx.state === 'suspended') {
             audioCtx.resume();
@@ -468,7 +473,7 @@
         audio.pause();
         isPlaying = false;
         updatePlayBtnUI(false);
-        musicBall.style.transform = 'scale(1)'; // 重置球體
+        musicBall.style.transform = 'scale(1)';
     }
 
     function updatePlayBtnUI(playing) {
@@ -497,7 +502,6 @@
             audio.currentTime = 0;
             playAudio();
         } else {
-            // All loop
             let next = currentIdx + 1;
             if(next >= tracks.length) next = 0;
             loadTrack(next, true);
@@ -521,8 +525,6 @@
         const pct = (audio.currentTime / audio.duration) * 100;
         progressSlider.value = pct;
         timeEl.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-        
-        // 讓滑桿背景漸變
         progressSlider.style.background = `linear-gradient(to right, var(--accent-2) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
     });
 
@@ -573,7 +575,6 @@
         renderPlaylist();
         musicBall.style.transform = 'scale(1)';
     };
-
 </script>
 </body>
 </html>
