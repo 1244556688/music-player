@@ -1,171 +1,164 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Glass Player — 完整版（含測試曲 + 中心球節奏動畫）</title>
-  <style>
-    :root{
-      --bg:#07060b; --card:rgba(255,255,255,0.04); --glass-border:rgba(255,255,255,0.06);
-      --accent1:#7C5CFF; --accent2:#00E5A8; --muted:rgba(255,255,255,0.65);
-    }
-    *{box-sizing:border-box} html,body{height:100%;margin:0;background:
-      radial-gradient(800px 400px at 10% 10%, rgba(124,92,255,0.05), transparent 6%),
-      linear-gradient(180deg,var(--bg),#050509); color:#eaf0ff; font-family:Inter, "Microsoft JhengHei", system-ui}
-    /* layout */
-    .wrap{display:flex;height:100vh;gap:20px;padding:22px}
-    .panel{background:var(--card);border-radius:14px;border:1px solid var(--glass-border);
-      padding:16px;box-shadow:0 10px 40px rgba(2,6,23,0.6);backdrop-filter:blur(8px) saturate(120%)}
-    /* left playlist */
-    #left{width:22%;display:flex;flex-direction:column;gap:12px;overflow:hidden}
-    #left .panel{flex:1;overflow:auto;padding:14px}
-    .track{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;
-      border-radius:10px;margin-bottom:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border:1px solid rgba(255,255,255,0.02);transition:transform .12s,box-shadow .12s}
-    .track:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(3,6,18,0.6)}
-    .meta{flex:1;padding-right:12px;font-size:14px;color:#e6f0ff}
-    .dur{font-size:12px;color:var(--muted)}
-    .small-btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;
-      background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;box-shadow:0 8px 24px rgba(2,6,23,0.5)}
-    /* center */
-    #center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
-    #title{font-size:20px;font-weight:800;color:var(--accent2);text-shadow:0 6px 28px rgba(0,229,168,0.06)}
-    #time{color:var(--muted);font-size:14px}
-    /* right controls */
-    #right{width:22%;display:flex;flex-direction:column;gap:12px}
-    #right .panel{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
-    .big-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:none;cursor:pointer;
-      font-weight:800;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;box-shadow:0 12px 30px rgba(2,6,23,0.5);position:relative;overflow:hidden}
-    .big-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
-    .big-btn::before{content:"";position:absolute;left:-120%;top:0;height:100%;width:40%;background:linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14), rgba(255,255,255,0.06));transform:skewX(-20deg);transition:left .6s}
-    .big-btn:hover::before{left:160%}
-    label.file-btn{cursor:pointer;padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,#2b2b36,#1a1a1f);border:1px solid rgba(255,255,255,0.04);color:var(--muted);display:inline-block;font-weight:700}
-    input[type=file]{display:none}
-    .row{width:100%;display:flex;flex-direction:column;gap:6px;align-items:stretch}
-    .slider{width:100%}
-    .mode-indicator{font-size:13px;color:var(--muted);text-align:center}
-    /* bottom spectrum */
-    #spectrumWrap{position:fixed;left:0;right:0;bottom:0;height:160px;pointer-events:none;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0 12px;box-sizing:border-box}
-    .sbg{position:absolute;width:100%;height:100%;backdrop-filter:blur(18px);background:rgba(20,20,30,0.35);border-top:1px solid rgba(255,255,255,0.12);box-shadow:0 -10px 40px rgba(0,229,168,0.08);z-index:1}
-    .sglow{position:absolute;bottom:0;left:50%;width:160%;height:140%;transform:translateX(-50%);background:radial-gradient(ellipse at bottom, rgba(0,255,255,0.25), rgba(255,0,255,0.08), transparent 70%);filter:blur(40px);z-index:0}
-    .bar {height:6px;width:calc(100%/64 - 3px);margin:0 1.5px;border-radius:8px 8px 0 0;background:linear-gradient(to top,#00fff7,#a855f7);box-shadow:0 6px 18px rgba(124,92,255,0.06), inset 0 -6px 18px rgba(0,229,168,0.06);transition:height 0.08s linear;z-index:2;opacity:0.4}
-    @media(max-width:1000px){.wrap{flex-direction:column;padding:12px}#left,#right{width:100%}#spectrumWrap{height:110px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass Player — 完整版</title>
+<style>
+:root{
+  --bg:#07060b; --card:rgba(255,255,255,0.04); --glass-border:rgba(255,255,255,0.06);
+  --accent1:#7C5CFF; --accent2:#00E5A8; --muted:rgba(255,255,255,0.65);
+}
+*{box-sizing:border-box} 
+html,body{height:100%;margin:0;background:radial-gradient(800px 400px at 10% 10%, rgba(124,92,255,0.05), transparent 6%), linear-gradient(180deg,var(--bg),#050509); color:#eaf0ff; font-family:Inter, "Microsoft JhengHei", system-ui}
+.wrap{display:flex;height:100vh;gap:20px;padding:22px}
+.panel{background:var(--card);border-radius:14px;border:1px solid var(--glass-border);padding:16px;box-shadow:0 10px 40px rgba(2,6,23,0.6);backdrop-filter:blur(8px) saturate(120%)}
+#left{width:22%;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+#left .panel{flex:1;overflow:auto;padding:14px}
+.track{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-radius:10px;margin-bottom:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02);transition:transform .12s,box-shadow .12s}
+.track:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(3,6,18,0.6)}
+.meta{flex:1;padding-right:12px;font-size:14px;color:#e6f0ff}
+.dur{font-size:12px;color:var(--muted)}
+.small-btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;box-shadow:0 8px 24px rgba(2,6,23,0.5)}
+#center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
+#title{font-size:20px;font-weight:800;color:var(--accent2);text-shadow:0 6px 28px rgba(0,229,168,0.06)}
+#time{color:var(--muted);font-size:14px}
+#musicBall{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00e5a8,#7c5cff);margin-top:16px;transition:transform 0.05s;}
+#right{width:22%;display:flex;flex-direction:column;gap:12px}
+#right .panel{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+.big-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:none;cursor:pointer;font-weight:800;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;box-shadow:0 12px 30px rgba(2,6,23,0.5);position:relative;overflow:hidden}
+.big-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
+.big-btn::before{content:"";position:absolute;left:-120%;top:0;height:100%;width:40%;background:linear-gradient(120deg, rgba(255,255,255,0.06), rgba(255,255,255,0.14), rgba(255,255,255,0.06));transform:skewX(-20deg);transition:left .6s}
+.big-btn:hover::before{left:160%}
+label.file-btn{cursor:pointer;padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,#2b2b36,#1a1a1f);border:1px solid rgba(255,255,255,0.04);color:var(--muted);display:inline-block;font-weight:700}
+input[type=file]{display:none}
+.slider{width:100%}
+.mode-indicator{font-size:13px;color:var(--muted);text-align:center}
+#spectrumWrap{position:fixed;left:0;right:0;bottom:0;height:160px;pointer-events:none;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0 12px;box-sizing:border-box}
+.sbg{position:absolute;width:100%;height:100%;backdrop-filter:blur(18px);background:rgba(20,20,30,0.35);border-top:1px solid rgba(255,255,255,0.12);box-shadow:0 -10px 40px rgba(0,229,168,0.08);z-index:1}
+.sglow{position:absolute;bottom:0;left:50%;width:160%;height:140%;transform:translateX(-50%);background:radial-gradient(ellipse at bottom, rgba(0,255,255,0.25), rgba(255,0,255,0.08), transparent 70%);filter:blur(40px);z-index:0}
+.bar {height:6px;width:calc(100%/64 - 3px);margin:0 1.5px;border-radius:8px 8px 0 0;background:linear-gradient(to top,#00fff7,#a855f7);box-shadow:0 6px 18px rgba(124,92,255,0.06), inset 0 -6px 18px rgba(0,229,168,0.06);transition:height 0.08s linear;z-index:2;opacity:0.4}
+@media(max-width:1000px){.wrap{flex-direction:column;padding:12px}#left,#right{width:100%}#spectrumWrap{height:110px}}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <!-- LEFT -->
+  <div id="left">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:800">播放清單</div>
+        <div style="font-size:12px;color:var(--muted)">點擊播放</div>
+      </div>
+      <div id="playlistArea"></div>
+    </div>
+    <div class="panel" style="display:flex;gap:8px;align-items:center;justify-content:center">
+      <label class="file-btn">＋ 新增音樂
+        <input id="fileAudio" type="file" accept="audio/*" multiple>
+      </label>
+      <button id="clearBtn" class="big-btn ghost">清除全部</button>
+    </div>
+  </div>
 
-  <!-- 中心跳動球 -->
-  <canvas id="beatBall" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;pointer-events:none;"></canvas>
+  <!-- CENTER -->
+  <div id="center" class="panel">
+    <div id="title">尚未播放</div>
+    <div id="time">00:00 / 00:00</div>
+    <div id="musicBall"></div>
+  </div>
 
-  <div class="wrap">
-    <!-- LEFT -->
-    <div id="left">
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:800">播放清單</div>
-          <div style="font-size:12px;color:var(--muted)">點擊播放</div>
+  <!-- RIGHT -->
+  <div id="right">
+    <div class="panel">
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;align-items:center">
+        <div class="mode-indicator">播放模式</div>
+        <button id="modeBtn" class="big-btn ghost">ALL ↺</button>
+        <div style="display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px">
+          <div style="display:flex;gap:10px;justify-content:center">
+            <button id="prevBtn" class="big-btn">⟸ 上一首</button>
+            <button id="playBtn" class="big-btn">▶ / ❚❚</button>
+            <button id="nextBtn" class="big-btn">下一首 ⟹</button>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <button id="delBtn" class="big-btn ghost">🗑 刪除目前</button>
+          </div>
         </div>
-        <div id="playlistArea"></div>
-      </div>
-      <div class="panel" style="display:flex;gap:8px;align-items:center;justify-content:center">
-        <label class="file-btn">＋ 新增音樂
-          <input id="fileAudio" type="file" accept="audio/*" multiple>
-        </label>
-        <button id="clearBtn" class="big-btn ghost">清除全部</button>
-      </div>
-    </div>
-
-    <!-- CENTER -->
-    <div id="center" class="panel" style="border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div id="title">尚未播放</div>
-      <div id="time">00:00 / 00:00</div>
-    </div>
-
-    <!-- RIGHT -->
-    <div id="right">
-      <div class="panel">
-        <div style="display:flex;flex-direction:column;gap:8px;width:100%;align-items:center">
-          <div class="mode-indicator">播放模式</div>
-          <button id="modeBtn" class="big-btn ghost">ALL ↺</button>
-          <div style="display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px">
-            <div style="display:flex;gap:10px;justify-content:center">
-              <button id="prevBtn" class="big-btn">⟸ 上一首</button>
-              <button id="playBtn" class="big-btn">▶ / ❚❚</button>
-              <button id="nextBtn" class="big-btn">下一首 ⟹</button>
-            </div>
-            <div style="display:flex;gap:10px;justify-content:center">
-              <button id="delBtn" class="big-btn ghost">🗑 刪除目前</button>
-            </div>
-          </div>
-          <div style="width:100%;margin-top:8px">
-            <div style="font-size:13px;color:var(--muted);margin-bottom:6px">音量</div>
-            <input id="vol" class="slider" type="range" min="0" max="1" step="0.01" value="0.85">
-          </div>
-          <div style="width:100%;margin-top:8px">
-            <div style="font-size:13px;color:var(--muted);margin-bottom:6px">進度</div>
-            <input id="progress" type="range" min="0" max="100" value="0" class="slider">
-          </div>
+        <div style="width:100%;margin-top:8px">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px">音量</div>
+          <input id="vol" class="slider" type="range" min="0" max="1" step="0.01" value="0.85">
+        </div>
+        <div style="width:100%;margin-top:8px">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px">進度</div>
+          <input id="progress" type="range" min="0" max="100" value="0" class="slider">
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- spectrum -->
-  <div id="spectrumWrap" aria-hidden="true">
-    <div class="sbg"></div>
-    <div class="sglow"></div>
-    <!-- bars inserted by JS -->
-  </div>
+<div id="spectrumWrap" aria-hidden="true">
+  <div class="sbg"></div>
+  <div class="sglow"></div>
+</div>
 
-  <!-- single audio element -->
-  <audio id="player" crossorigin="anonymous"></audio>
+<audio id="player" crossorigin="anonymous"></audio>
 
 <script>
-/* ========== 原本你的 JS 都保留 ========== */
-// 省略此處原本 JS，保持你給我的內容
-// ======================
-// 只加中間球動畫
-const ballCanvas = document.getElementById('beatBall');
-const bCtx = ballCanvas.getContext('2d');
-function resizeBallCanvas(){
-  ballCanvas.width = window.innerWidth;
-  ballCanvas.height = window.innerHeight;
-}
-resizeBallCanvas();
-window.addEventListener('resize', resizeBallCanvas);
+// ===== 基本變數 =====
+const fileAudio=document.getElementById('fileAudio');
+const playlistArea=document.getElementById('playlistArea');
+const titleEl=document.getElementById('title');
+const timeEl=document.getElementById('time');
+const modeBtn=document.getElementById('modeBtn');
+const prevBtn=document.getElementById('prevBtn');
+const playBtn=document.getElementById('playBtn');
+const nextBtn=document.getElementById('nextBtn');
+const delBtn=document.getElementById('delBtn');
+const volSlider=document.getElementById('vol');
+const progress=document.getElementById('progress');
+const clearBtn=document.getElementById('clearBtn');
+const spectrumWrap=document.getElementById('spectrumWrap');
+const audio=document.getElementById('player');
+const musicBall=document.getElementById('musicBall');
 
-let ballRadius = 50;
-function drawBall(){
-  if(!analyser) return requestAnimationFrame(drawBall);
-  analyser.getByteFrequencyData(freqArray);
-  // 取低頻平均值
-  let bass = 0;
-  for(let i=0;i<10;i++) bass += freqArray[i];
-  bass = bass / 10 / 255; // 0~1
-  ballRadius += (50 + bass*120 - ballRadius)*0.2;
+let audioCtx=null, analyser=null, sourceNode=null, freqArray=null;
+let tracks=[], current=-1, raf=null, playing=false;
+let mode='all', BAR_COUNT=64;
 
-  bCtx.clearRect(0,0,ballCanvas.width,ballCanvas.height);
-  // 外圈光暈
-  let grd = bCtx.createRadialGradient(
-    ballCanvas.width/2, ballCanvas.height/2, ballRadius*0.5,
-    ballCanvas.width/2, ballCanvas.height/2, ballRadius
-  );
-  grd.addColorStop(0,'rgba(0,255,255,0.6)');
-  grd.addColorStop(1,'rgba(0,255,255,0.0)');
-  bCtx.fillStyle = grd;
-  bCtx.beginPath();
-  bCtx.arc(ballCanvas.width/2, ballCanvas.height/2, ballRadius,0,Math.PI*2);
-  bCtx.fill();
+// ===== 音樂頻譜 =====
+function makeBars(){ spectrumWrap.querySelectorAll('.bar').forEach(b=>b.remove()); for(let i=0;i<BAR_COUNT;i++){ const b=document.createElement('div'); b.className='bar'; b.style.width=`calc(${100/BAR_COUNT}% - 3px)`; spectrumWrap.appendChild(b);} }
+makeBars();
 
-  // 中心小球
-  bCtx.fillStyle = 'rgba(0,255,255,1)';
-  bCtx.beginPath();
-  bCtx.arc(ballCanvas.width/2, ballCanvas.height/2, ballRadius*0.25,0,Math.PI*2);
-  bCtx.fill();
+function ensureAudioCtx(){ if(audioCtx) return; audioCtx=new (window.AudioContext||window.webkitAudioContext)(); analyser=audioCtx.createAnalyser(); analyser.fftSize=256; sourceNode=audioCtx.createMediaElementSource(audio); sourceNode.connect(analyser); analyser.connect(audioCtx.destination); freqArray=new Uint8Array(analyser.frequencyBinCount); }
 
-  requestAnimationFrame(drawBall);
-}
-drawBall();
+function startVisualizer(){ ensureAudioCtx(); if(!analyser)return; analyser.smoothingTimeConstant=0.6; freqArray=new Uint8Array(analyser.frequencyBinCount); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(drawBars); }
+function stopVisualizer(){ if(raf) cancelAnimationFrame(raf); raf=null; document.querySelectorAll('.bar').forEach(b=>{b.style.height='6px';b.style.opacity='0.25';}); musicBall.style.transform='scale(1)'; }
+
+function drawBars(){ analyser.getByteFrequencyData(freqArray); const bars=document.querySelectorAll('.bar'); let sum=0; const step=Math.floor(freqArray.length/bars.length); for(let i=0;i<bars.length;i++){ const v=freqArray[i*step]; const h=Math.max(6,Math.round(v/255*120)); bars[i].style.height=h+'px'; bars[i].style.opacity=Math.max(0.35,v/255); sum+=v; } musicBall.style.transform=`scale(${1+sum/bars.length/255})`; raf=requestAnimationFrame(drawBars); }
+
+// ===== 播放列表 =====
+function renderTracks(){ playlistArea.innerHTML=''; tracks.forEach((t,i)=>{ const div=document.createElement('div'); div.className='track'; div.innerHTML=`<div class="meta">${t.name}</div><div style="display:flex;align-items:center;gap:8px"><div class="dur">${t.duration?formatTime(t.duration):'--:--'}</div><button class="small-btn" data-i="${i}">播放</button></div>`; playlistArea.appendChild(div); }); playlistArea.querySelectorAll('.small-btn').forEach(btn=>btn.onclick=e=>playIndex(parseInt(e.currentTarget.dataset.i,10))); }
+
+fileAudio.addEventListener('change', e=>{ addFiles(Array.from(e.target.files||[])); fileAudio.value=''; });
+function addFiles(files){ files.forEach(f=>{ const url=URL.createObjectURL(f); const rec={name:f.name,url,duration:null}; tracks.push(rec); const tmp=new Audio(); tmp.src=url; tmp.addEventListener('loadedmetadata',()=>{ rec.duration=tmp.duration; renderTracks(); },{once:true}); }); renderTracks(); if(current===-1 && tracks.length>0) playIndex(0); }
+
+function playIndex(i){ if(i<0||i>=tracks.length) return; current=i; audio.src=tracks[i].url; titleEl.textContent=tracks[i].name; ensureAudioCtx(); if(audioCtx.state==='suspended') audioCtx.resume(); audio.play(); playing=true; startVisualizer(); }
+
+function playNext(){ if(!tracks.length) return; if(mode==='one'){ audio.currentTime=0; audio.play(); return;} if(mode==='shuffle'){ let next; do{ next=Math.floor(Math.random()*tracks.length);}while(next===current && tracks.length>1); playIndex(next); return;} playIndex((current+1)%tracks.length); }
+function playPrev(){ if(!tracks.length) return; playIndex((current-1+tracks.length)%tracks.length); }
+
+playBtn.onclick=()=>{ if(audio.paused){ audio.play(); playing=true; startVisualizer(); } else { audio.pause(); playing=false; stopVisualizer(); } };
+prevBtn.onclick=playPrev; nextBtn.onclick=playNext;
+delBtn.onclick=()=>{ if(current<0)return; audio.pause(); audio.src=''; stopVisualizer(); tracks.splice(current,1); renderTracks(); current=-1; titleEl.textContent='尚未播放'; timeEl.textContent='00:00 / 00:00'; }
+clearBtn.onclick=()=>{ audio.pause(); audio.src=''; stopVisualizer(); tracks=[]; renderTracks(); current=-1; titleEl.textContent='尚未播放'; timeEl.textContent='00:00 / 00:00'; }
+modeBtn.onclick=()=>{ if(mode==='all'){ mode='one'; modeBtn.textContent='ONE ↻'; } else if(mode==='one'){ mode='shuffle'; modeBtn.textContent='SHUFFLE ⇄'; } else { mode='all'; modeBtn.textContent='ALL ↺'; } }
+
+audio.addEventListener('timeupdate',()=>{ if(!isFinite(audio.duration)) return; timeEl.textContent=`${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`; progress.value=(audio.currentTime/audio.duration)*100; });
+progress.addEventListener('input', e=>{ if(audio.duration) audio.currentTime=e.target.value/100*audio.duration; });
+volSlider.addEventListener('input', e=>audio.volume=parseFloat(e.target.value));
+audio.addEventListener('ended',()=>{ if(playing) playNext(); });
+
+function formatTime(s){ if(!isFinite(s)) return '00:00'; const m=Math.floor(s/60).toString().padStart(2,'0'); const sec=Math.floor(s%60).toString().padStart(2,'0'); return `${m}:${sec}`; }
 </script>
 </body>
 </html>
