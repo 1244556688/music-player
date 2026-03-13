@@ -575,6 +575,20 @@
         renderPlaylist();
         musicBall.style.transform = 'scale(1)';
     };
+    // === 預設歌曲 ===
+window.addEventListener("load", () => {
+
+    const defaultTrack = {
+        name: "為自己吶喊",
+        url: "為自己吶喊.mp3"
+    };
+
+    tracks.push(defaultTrack);
+
+    renderPlaylist();
+
+    loadTrack(0, true); // 載入但不自動播放
+});
 </script>
 </body>
 </html>
